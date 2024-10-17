@@ -57,3 +57,23 @@ def test_create_transaction(deposit_transaction):
     assert transaction["type"] == "deposit"
     assert transaction["date"] == date.today().isoformat()
     assert transaction["state"] == "pending"
+
+
+def test_get_balance_nonexisting_user():
+    response = client.get("users/999/balance")
+    assert response.status_code == 404
+
+
+def test_get_balance_nonexisting_user():
+    response = client.get("users/999/balance")
+    assert response.status_code == 404
+
+
+def test_get_balance_transactionempty():
+    response = client.get("users/3/balance")
+    assert response.status_code == 200
+    transaction = response.json()
+    assert transaction["completed_withdrawals"] == []
+    assert transaction["balance"] == 0.0
+    assert transaction["coverage_of_scheduled_withdrawals"] == []
+

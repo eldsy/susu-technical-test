@@ -28,7 +28,9 @@ def transaction(db: Database, user_id: int, transaction_id: int) -> TransactionR
     return transaction if transaction and transaction.user_id == user_id else None
 
 
-def transactions_by_type_states(db: Database, user_id: int, type: str, states: List[str]) -> List[TransactionRow]:
+def transactions_by_type_states(
+    db: Database, user_id: int, type: str, states: List[str]
+) -> List[TransactionRow]:
     """
     Returns a given transaction of the user filtering by type and state
     """
