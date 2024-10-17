@@ -4,10 +4,14 @@ from fastapi import FastAPI, HTTPException
 
 from backend.db import InMemoryDB
 from backend.logic import transactions, users
+from backend.logic.transaction_services import (
+    calcul_balance,
+    get_coverage_of_scheduled_withdrawals,
+)
 from backend.models import Transaction, TransactionRow
+from backend.models.models import TransactionState, TransactionType
 
 app = FastAPI()
-
 db = InMemoryDB()
 
 
@@ -42,8 +46,21 @@ async def create_transaction(user_id: int, transaction: Transaction) -> Transact
     return transactions.create_transaction(db, user_id, transaction)
 
 
-@app.get("/users/{user_id}/transactions/balance")
+@app.get("/users/{user_id}/balance")
 async def get_balance(user_id: int) -> Any:  # pylint: disable=unused-argument
     """Computes the balance of payments for a user subscription."""
-    # We expect you to write this function
-    return None
+
+    if users.user(db, user_id) is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    else:
+        completed_withdrawals = transactions.transactions_by_type_states(
+            db, user_id, TransactionType.SCHEDULED_WITHDRAWAL, [TransactionState.COMPLETED]
+        )
+        coverage_of_scheduled_withdrawals = get_coverage_of_scheduled_withdrawals(user_id)
+        current_balance = calcul_balance(user_id)
+
+        return {
+            "completed_withdrawals": completed_withdrawals,
+            "coverage_of_scheduled_withdrawals": coverage_of_scheduled_withdrawals,
+            "balance": current_balance,
+        }

@@ -15,6 +15,12 @@
       "name": "Tata",
       "email": "tata@orange.fr"
     }
+    ,
+    {
+      "id": 4,
+      "name": "Fifi",
+      "email": "fifi@orange.fr"
+    }
   ],
   "transactions": [
     {
